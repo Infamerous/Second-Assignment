@@ -126,17 +126,6 @@ public:
             }
         }
     }
-    
-    void PriorityQueue() {
-        Heap tempHeap(maxSize);
-        for (int i = 1; i <= currentSize; i++) {
-            tempHeap.insert(heapArray[i]->getKey());
-        }
-        while (!tempHeap.isEmpty()) {
-            cout << tempHeap.remove()->getKey() << " ";
-        }
-        cout << endl;
-    }
 
 };
 
@@ -162,21 +151,9 @@ int main() {
     cout << "Min Heap after inserting 2: ";
     heap.displayHeap();
 
-    heap.heapSort(false); //decreasing
-    cout << endl;
-    heap.heapSort(true); //increasing
-    cout << endl;
-    
-    cout << "Priority Queue 1: ";
-    heap.PriorityQueue();
-    
     heap.remove();
-    cout << "Min-heap after the delete section: "; //smallest number 1 is gone
+    cout << "Min-heap after deleting smallest number: "; //smallest number 1 is gone
     heap.displayHeap();
-    
-    cout << "Priority Queue 2: ";
-    heap.PriorityQueue();
-    cout << endl;
-    
+
     return 0;
 }
