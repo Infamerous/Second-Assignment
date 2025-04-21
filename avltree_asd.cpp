@@ -1,17 +1,19 @@
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 class Node {
 public:
     int key;
-    int height;
     Node* left;
     Node* right;
+    int height;
 
     Node(int k) {
         key = k;
         height = 1;
-        left = right = nullptr;
+        left = nullptr;
+        right = nullptr;
     }
 };
 
@@ -20,11 +22,15 @@ private:
     Node* root;
 
     int height(Node* node) {
-        return node ? node->height : 0;
+        if (node == nullptr)
+            return 0;
+        return node->height;
     }
 
-    int getBalance(Node* node) {
-        return node ? height(node->left) - height(node->right) : 0;
+    int balanceFactor(Node* node) {
+        if (node == nullptr)
+            return 0;
+        return height(node->left) - height(node->right);
     }
 
     Node* rightRotate(Node* y) {
@@ -65,7 +71,7 @@ private:
             return node;
 
         node->height = 1 + max(height(node->left), height(node->right));
-        int balance = getBalance(node);
+        int balance = balanceFactor(node);
 
         if (balance > 1 && key < node->left->key)
             return rightRotate(node);
@@ -115,22 +121,31 @@ private:
         }
 
         node->height = 1 + max(height(node->left), height(node->right));
-        int balance = getBalance(node);
+        int balance = balanceFactor(node);
 
-        if (balance > 1 && getBalance(node->left) >= 0)
+        if (balance > 1 && balanceFactor(node->left) >= 0)
             return rightRotate(node);
-        if (balance > 1 && getBalance(node->left) < 0) {
+        if (balance > 1 && balanceFactor(node->left) < 0) {
             node->left = leftRotate(node->left);
             return rightRotate(node);
         }
-        if (balance < -1 && getBalance(node->right) <= 0)
+        if (balance < -1 && balanceFactor(node->right) <= 0)
             return leftRotate(node);
-        if (balance < -1 && getBalance(node->right) > 0) {
+        if (balance < -1 && balanceFactor(node->right) > 0) {
             node->right = rightRotate(node->right);
             return leftRotate(node);
         }
 
         return node;
+    }
+
+    void inOrderPrint(Node* node)
+    {
+        if (node != nullptr) {
+            inOrderPrint(node->left);
+            cout << node->key << " ";
+            inOrderPrint(node->right);
+        }
     }
 
     void preOrderPrint(Node* node) {
@@ -141,10 +156,29 @@ private:
         }
     }
 
-public:
-    AVL() {
-        root = nullptr;
+    void postOrderPrint(Node* node)
+    {
+        if (node != nullptr) {
+            postOrderPrint(node->left); 
+            postOrderPrint(node->right);
+            cout << node->key << " ";
+        }
     }
+
+    bool searchNode(Node* node, int key)
+    {
+        if (!node)
+            return false;
+        if (node->key == key)
+            return true;
+        if (key < node->key)
+            return searchNode(node->left, key);
+        else
+            return searchNode(node->right, key);
+    }
+
+public:
+    AVL() : root(nullptr) {}
 
     void insert(int key) {
         root = insertNode(root, key);
@@ -153,31 +187,69 @@ public:
     void remove(int key) {
         root = deleteNode(root, key);
     }
+    
+    void inOrder() {
+        cout << "Inorder: ";
+        inOrderPrint(root);
+        cout << endl;
+    }
 
     void preOrder() {
-        cout << "Pre-order: ";
+        cout << "Preorder: ";
         preOrderPrint(root);
         cout << endl;
     }
+
+    void postOrder() {
+        cout << "Postorder: ";
+        postOrderPrint(root);
+        cout << endl;
+    }
+
+    bool search(int key) {
+        return searchNode(root,key);
+    }
+
 };
 
 int main() {
     AVL tree;
+    cout << "--- AVL TREE ---\n";
     tree.insert(33);
     tree.insert(13);
-    tree.insert(53);
-    tree.insert(9);
-    tree.insert(21);
+    tree.insert(56);
+    tree.insert(10);
+    tree.insert(23);
+    tree.insert(43);
     tree.insert(61);
-    tree.insert(8);
-    tree.insert(11);
-
-    tree.preOrder();
-    tree.remove(13);
-    cout << "After deleting 13 ";
-    tree.preOrder();
     tree.insert(5);
-    cout << "After inserting 5 ";
+
+    tree.inOrder();
     tree.preOrder();
+    tree.postOrder();
+    
+    tree.remove(13);
+    cout << "--- After deleting 13 ---\n";
+    tree.inOrder();
+    tree.preOrder();
+    tree.postOrder();
+    
+    tree.insert(11);
+    cout << "--- After inserting 11 ---\n";
+    tree.inOrder();
+    tree.preOrder();
+    tree.postOrder();
+    
+    cout << "--- Search ---\n";
+    
+    if (tree.search(33))
+        cout << "33 is in the tree\n";
+    else
+        cout << "33 is NOT in the tree\n";
+    
+    if (tree.search(15))
+        cout << "15 is in the tree\n";
+    else
+        cout << "15 is NOT in the tree\n";
     return 0;
 }
